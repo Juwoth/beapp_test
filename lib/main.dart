@@ -1,4 +1,7 @@
+import 'package:beapp_exercice/presentation/pages/home.dart';
+import 'package:beapp_exercice/presentation/pages/search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,12 +13,26 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-
-        primarySwatch: Colors.yellow,
+        primarySwatch: const MaterialColor(
+          0xFF087FA3,
+          <int, Color>{
+            50: Color(0xFF087FA3),
+            100: Color(0xFF087FA3),
+            200: Color(0xFF087FA3),
+            300: Color(0xFF087FA3),
+            400: Color(0xFF087FA3),
+            500: Color(0xFF087FA3),
+            600: Color(0xFF087FA3),
+            700: Color(0xFF087FA3),
+            800: Color(0xFF087FA3),
+            900: Color(0xFF087FA3),
+          },
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Exercice Technique'),
     );
   }
 }
@@ -30,29 +47,64 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final globalKey = GlobalKey<ScaffoldState>();
+  final screens = [const Home(), const Search()];
+  int _selectedIndex = 0;
 
-  void _incrementCounter() {
+  void _onItemTapped(int index) {
     setState(() {
-      _counter++;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: globalKey,
+      endDrawer: const Drawer(
+        elevation: 1.0,
+      ),
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Hello World',
-              style: Theme.of(context).textTheme.headline3,
-            ),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: screens,
+      ),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+                color: Colors.black,
+                blurRadius: 15.0,
+                offset: Offset(0.0, 0.75))
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
+          ),
+          child: BottomNavigationBar(
+            elevation: 10,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Color(0xFF087FA3),
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.map),
+                label: "Plan",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.search),
+                label: "Recherche",
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            onTap: (value) {
+              _onItemTapped(value);
+              HapticFeedback.heavyImpact();
+            },
+          ),
         ),
       ),
     );
