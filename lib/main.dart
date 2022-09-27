@@ -48,7 +48,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final globalKey = GlobalKey<ScaffoldState>();
-  final screens = [const Home(), const Search()];
+  final screens = [
+    const Home(),
+    const Search(),
+  ];
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -61,9 +64,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: globalKey,
-      endDrawer: const Drawer(
-        elevation: 1.0,
-      ),
       appBar: AppBar(
         title: Text(widget.title),
       ),
@@ -76,14 +76,14 @@ class _MyHomePageState extends State<MyHomePage> {
           boxShadow: <BoxShadow>[
             BoxShadow(
                 color: Colors.black,
-                blurRadius: 15.0,
+                blurRadius: 10.0,
                 offset: Offset(0.0, 0.75))
           ],
         ),
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(30.0),
-            topRight: Radius.circular(30.0),
+            topLeft: Radius.circular(15.0),
+            topRight: Radius.circular(15.0),
           ),
           child: BottomNavigationBar(
             elevation: 10,
@@ -102,7 +102,6 @@ class _MyHomePageState extends State<MyHomePage> {
             currentIndex: _selectedIndex,
             onTap: (value) {
               _onItemTapped(value);
-              HapticFeedback.heavyImpact();
             },
           ),
         ),
