@@ -1,7 +1,6 @@
 import 'package:beapp_exercice/presentation/pages/home.dart';
 import 'package:beapp_exercice/presentation/pages/search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -88,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: BottomNavigationBar(
             elevation: 10,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: Color(0xFF087FA3),
+            selectedItemColor: const Color(0xFF087FA3),
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.map),
