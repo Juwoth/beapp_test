@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.search),
-                label: "Recherche",
+                label: "Liste",
               ),
             ],
             currentIndex: _selectedIndex,
