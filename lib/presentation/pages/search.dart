@@ -14,20 +14,15 @@ class Search extends StatefulWidget {
 class StationInformation {
   final String name, address;
   final int availableBikes, capacity;
+  final position;
 
-  //final double latitude, longitude;
-
-  StationInformation(this.name,
-      this.address,
-      this.availableBikes,
-      this.capacity,
-      //this.latitude,
-      //this.longitude,
+  StationInformation(
+      this.name, this.address, this.availableBikes, this.capacity, this.position
       );
 }
 
 class _SearchState extends State<Search> {
-  bool availableBikeOnly = false;
+  bool availableBikeOnly = true;
 
   Future getStationData() async {
     var response = await http.get(Uri.https(
@@ -38,15 +33,14 @@ class _SearchState extends State<Search> {
     var utf8Response = Utf8Decoder().convert(response.bodyBytes);
     var jsonData = jsonDecode(utf8Response);
     List<StationInformation> stationInformations = [];
-
     for (var u in jsonData) {
       StationInformation stationInformation = StationInformation(
         u['name'],
         u['address'],
         u['available_bikes'],
         u['bike_stands'],
-        //u['position'],
-        //u['position']
+        u['position'],
+
       );
       stationInformations.add(stationInformation);
     }
@@ -101,35 +95,17 @@ class _SearchState extends State<Search> {
                           shrinkWrap: true,
                           itemCount: snapshot.data.length,
                           itemBuilder: (context, i) {
-                            if (availableBikeOnly =
-                                true && snapshot.data[i].availableBikes > 15) {
-                              return Card(
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 12),
-                                child: ListTile(
-                                  leading: Icon(Icons.bike_scooter),
-                                  title: Text(snapshot.data[i].name),
-                                  subtitle: Text(snapshot.data[i].address),
-                                  trailing: Text(
-                                      "${snapshot.data[i]
-                                          .availableBikes}/${snapshot.data[i]
-                                          .capacity} disponibles."),
-                                ),
-                              );
-                            } else
-                              return Card(
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 12),
-                                child: ListTile(
-                                  leading: Icon(Icons.bike_scooter),
-                                  title: Text(snapshot.data[i].name),
-                                  subtitle: Text(snapshot.data[i].address),
-                                  trailing: Text(
-                                      "${snapshot.data[i]
-                                          .availableBikes}/${snapshot.data[i]
-                                          .capacity} disponibles."),
-                                ),
-                              );
+                            return Card(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 12),
+                              child: ListTile(
+                                leading: Icon(Icons.bike_scooter),
+                                title: Text(snapshot.data[i].name),
+                                subtitle: Text(snapshot.data[i].address),
+                                trailing: Text(
+                                    "${snapshot.data[i].availableBikes}/${snapshot.data[i].capacity} disponibles."),
+                              ),
+                            );
                           },
                         ),
                       ),
