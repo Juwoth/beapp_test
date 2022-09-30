@@ -10,6 +10,7 @@ The list displays:
 - The name of the station
 - The address
 - The number of bikes currently availables
+
 for every stations.
 
 The user can also filter the list by entering a query in the searchbar, it will filter by the station name.
