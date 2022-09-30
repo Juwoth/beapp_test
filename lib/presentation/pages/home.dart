@@ -5,6 +5,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 
+import '../widgets/molecules/searchbar.dart';
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -24,6 +26,8 @@ class MarkersInformations {
 }
 
 class HomeState extends State<Home> {
+  List<Marker> markersList = [];
+
   Future getMarkersData() async {
     var response = await http.get(Uri.https(
         "api.jcdecaux.com", "/vls/v1/stations", {
@@ -32,14 +36,26 @@ class HomeState extends State<Home> {
     }));
     var jsonData = jsonDecode(response.body);
     List<MarkersInformations> markersInformations = [];
-    for (var m in jsonData) {
+    for (var marker in jsonData) {
       MarkersInformations markersInformation = MarkersInformations(
-        m['position'],
-        m['available_bikes'],
-        m['bike_stands'],
+        marker['position'],
+        marker['available_bikes'],
+        marker['bike_stands'],
       );
+      // Create a list of markers to display on the map
       markersInformations.add(markersInformation);
+      markersList.add(
+        Marker(
+          point: LatLng(marker['position']['lat'], marker['position']['lng']),
+          builder: (context) => const Icon(
+            Icons.location_on,
+            color: Colors.red,
+            size: 20,
+          ),
+        ),
+      );
     }
+
     return markersInformations;
   }
 
@@ -48,114 +64,61 @@ class HomeState extends State<Home> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-              child: Card(
+          Card(
             child: FutureBuilder(
-              future: getMarkersData(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.data == null) {
-                  return const Center(
-                    child: Text("Loading..."),
-                  );
-                } else {
-                  return FlutterMap(
-                    options: MapOptions(
-                        center: LatLng(47.2070626, -1.5588555),
-                        zoom: 9.2,
-                        interactiveFlags:
-                            InteractiveFlag.pinchZoom | InteractiveFlag.drag,
-                        maxBounds: LatLngBounds(
-                          LatLng(51.3588166, -5.5522604),
-                          LatLng(40.1290318, 11.8739863),
-                        )),
-                    nonRotatedChildren: [
-                      AttributionWidget.defaultWidget(
-                        source: "OpenStreetMap contributors",
-                        onSourceTapped: null,
-                      ),
-                    ],
-                    children: [
-                      TileLayer(
-                        urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.beapp.beapp_exercice',
-                      ),
-                      MarkerLayer(
-                        markers: [
-                          Marker(
-                            point: LatLng(47, -1),
-                            builder: (context) => const Icon(
-                              Icons.location_on,
-                              color: Colors.red,
-                              size: 50,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-          )),
-          Container(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              focusNode: FocusNode(canRequestFocus: false),
-              textInputAction: TextInputAction.search,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xAAFFFFFF),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: const BorderSide(
-                    color: Colors.grey,
+          future: getMarkersData(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.data == null) {
+              return const Center(
+                child: Text("Loading..."),
+              );
+            } else {
+              return FlutterMap(
+                options: MapOptions(
+                    // Focus the map on the center of Nantes
+                    center: LatLng(47.2156281, -1.5524987),
+                    zoom: 14,
+                    // Enable only the pinch zoom and drag
+                    interactiveFlags:
+                        InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+                    // Set the boundaries to Nantes only
+                    maxBounds: LatLngBounds(
+                      LatLng(47.301540, -1.621354),
+                      LatLng(47.171137, -1.471111),
+                    )),
+                nonRotatedChildren: [
+                  AttributionWidget.defaultWidget(
+                    source: "OpenStreetMap contributors",
+                    onSourceTapped: null,
                   ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                  borderSide: const BorderSide(
-                    color: Colors.blue,
+                ],
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.beapp.beapp_exercice',
                   ),
-                ),
-                suffixIcon: const InkWell(
-                  child: Icon(Icons.search),
-                ),
-                contentPadding: const EdgeInsets.fromLTRB(25, 6, 0, 6),
-                hintText: "Point de départ",
-              ),
+                  MarkerLayer(
+                    markers: markersList,
+                  ),
+                ],
+              );
+            }
+          },
             ),
           ),
           Container(
+            padding: const EdgeInsets.all(12),
+            child: Searchbar(hintText: "Point de départ"),
+          ),
+          Container(
             padding: const EdgeInsets.fromLTRB(12, 65, 12, 12),
-            child: TextField(
-              focusNode: FocusNode(canRequestFocus: false),
-              textInputAction: TextInputAction.search,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xAAFFFFFF),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: const BorderSide(
-                    color: Colors.grey,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                  borderSide: const BorderSide(
-                    color: Colors.blue,
-                  ),
-                ),
-                suffixIcon: const InkWell(
-                  child: Icon(Icons.search),
-                ),
-                contentPadding: const EdgeInsets.fromLTRB(25, 6, 0, 6),
-                hintText: "Point d'arrivée",
-              ),
-            ),
+            child: Searchbar(hintText: "Point d'arrivée"),
           ),
         ],
       ),
     );
   }
 }
+
+

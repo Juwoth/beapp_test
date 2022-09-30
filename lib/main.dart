@@ -1,5 +1,6 @@
 import 'package:beapp_exercice/presentation/pages/home.dart';
 import 'package:beapp_exercice/presentation/pages/search.dart';
+import 'package:beapp_exercice/presentation/styles/colors.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -18,16 +19,16 @@ class MyApp extends StatelessWidget {
         primarySwatch: const MaterialColor(
           0xFF087FA3,
           <int, Color>{
-            50: Color(0xFF087FA3),
-            100: Color(0xFF087FA3),
-            200: Color(0xFF087FA3),
-            300: Color(0xFF087FA3),
-            400: Color(0xFF087FA3),
-            500: Color(0xFF087FA3),
-            600: Color(0xFF087FA3),
-            700: Color(0xFF087FA3),
-            800: Color(0xFF087FA3),
-            900: Color(0xFF087FA3),
+            50: AppColors.mainBlue,
+            100: AppColors.mainBlue,
+            200: AppColors.mainBlue,
+            300: AppColors.mainBlue,
+            400: AppColors.mainBlue,
+            500: AppColors.mainBlue,
+            600: AppColors.mainBlue,
+            700: AppColors.mainBlue,
+            800: AppColors.mainBlue,
+            900: AppColors.mainBlue,
           },
         ),
       ),
@@ -87,14 +88,13 @@ class _MyHomePageState extends State<MyHomePage> {
           child: BottomNavigationBar(
             elevation: 10,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: const Color(0xFF087FA3),
+            selectedItemColor: AppColors.mainBlue,
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: Icon(Icons.map),
-                label: "Plan",
-              ),
+                icon: Icon(Icons.map, key: Key('First')),
+                label:  "Plan"),
               BottomNavigationBarItem(
-                icon: Icon(Icons.search),
+                icon: Icon(Icons.list, key: Key('Second')),
                 label: "Liste",
               ),
             ],

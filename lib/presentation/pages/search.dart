@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../styles/colors.dart';
+
 class Search extends StatefulWidget {
   const Search({Key? key}) : super(key: key);
 
@@ -14,15 +16,14 @@ class Search extends StatefulWidget {
 class StationInformation {
   final String name, address;
   final int availableBikes, capacity;
-  final position;
 
   StationInformation(
-      this.name, this.address, this.availableBikes, this.capacity, this.position
-      );
+      this.name, this.address, this.availableBikes, this.capacity);
 }
 
 class _SearchState extends State<Search> {
-  bool availableBikeOnly = true;
+  bool availableBikeOnly = false;
+  String searchString = "";
 
   Future getStationData() async {
     var response = await http.get(Uri.https(
@@ -39,8 +40,6 @@ class _SearchState extends State<Search> {
         u['address'],
         u['available_bikes'],
         u['bike_stands'],
-        u['position'],
-
       );
       stationInformations.add(stationInformation);
     }
@@ -50,36 +49,60 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              focusNode: FocusNode(canRequestFocus: false),
-              textInputAction: TextInputAction.search,
-              decoration: InputDecoration(
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: const BorderSide(
-                    color: Colors.grey,
+      resizeToAvoidBottomInset: false,
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(12),
+              child:
+                  // Search Bar
+                  TextField(
+                onChanged: (value) {
+                  setState(() {
+                    searchString = value.toLowerCase();
+                  });
+                },
+                focusNode: FocusNode(canRequestFocus: false),
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  labelText: "Recherche",
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25.0),
+                    borderSide: const BorderSide(
+                      color: Colors.grey,
+                    ),
                   ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                  borderSide: const BorderSide(
-                    color: Colors.blue,
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                    borderSide: const BorderSide(
+                      color: Colors.blue,
+                    ),
                   ),
+                  suffixIcon: const InkWell(
+                    child: Icon(Icons.search),
+                  ),
+                  contentPadding: const EdgeInsets.all(12.0),
+                  hintText: "Nom de station",
                 ),
-                suffixIcon: const InkWell(
-                  child: Icon(Icons.search),
-                ),
-                contentPadding: const EdgeInsets.all(12.0),
-                hintText: "Recherche",
               ),
             ),
-          ),
-          Container(
-            child: Card(
+            Row(
+              children: [
+                Switch(
+                  value: availableBikeOnly,
+                  activeColor: AppColors.mainBlue,
+                  onChanged: (bool value){
+                    setState(() {
+                      availableBikeOnly = value;
+                    });
+                  },
+                ),
+                const Text("Vélos disponibles uniquement."),
+              ],
+            ),
+            Card(
               child: FutureBuilder(
                 future: getStationData(),
                 builder: (context, AsyncSnapshot snapshot) {
@@ -89,23 +112,31 @@ class _SearchState extends State<Search> {
                     );
                   } else {
                     return Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: 620,
-                        child: ListView.builder(
+                        child: ListView.separated(
                           shrinkWrap: true,
                           itemCount: snapshot.data.length,
-                          itemBuilder: (context, i) {
-                            return Card(
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 12),
-                              child: ListTile(
-                                leading: Icon(Icons.bike_scooter),
-                                title: Text(snapshot.data[i].name),
-                                subtitle: Text(snapshot.data[i].address),
-                                trailing: Text(
-                                    "${snapshot.data[i].availableBikes}/${snapshot.data[i].capacity} disponibles."),
-                              ),
-                            );
+                          itemBuilder: (context, index) {
+                            return snapshot.data![index].name
+                                    .toLowerCase()
+                                    .contains(searchString)
+                                ? ListTile(
+                                    leading: const Icon(Icons.pedal_bike),
+                                    title: Text(snapshot.data![index].name),
+                                    subtitle:
+                                        Text(snapshot.data![index].address),
+                                    trailing: Text(
+                                        "${snapshot.data[index].availableBikes}/${snapshot.data[index].capacity} disponibles."),
+                                  )
+                                : Container();
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return snapshot.data![index].name
+                                    .toLowerCase()
+                                    .contains(searchString)
+                                ? const Divider()
+                                : Container();
                           },
                         ),
                       ),
@@ -113,9 +144,9 @@ class _SearchState extends State<Search> {
                   }
                 },
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
