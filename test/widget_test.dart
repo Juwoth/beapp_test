@@ -11,20 +11,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:beapp_exercice/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Switch to the list screen and add text to the TextField', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Check if there's two TextField Widget
+    expect(find.byType(TextField), findsAtLeastNWidgets(2));
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Initialize and touche the "Liste" icon
+    await tester.tap(find.byIcon(Icons.list));
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Check if there's a TextField Widget
+    expect(find.text("Recherche"), findsOneWidget);
+
   });
 }
