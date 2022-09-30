@@ -25,12 +25,14 @@ class _SearchState extends State<Search> {
   bool availableBikeOnly = false;
   String searchString = "";
 
+  // Get informations about the stations (Name, address, bike available and station capacity)
   Future getStationData() async {
     var response = await http.get(Uri.https(
         "api.jcdecaux.com", "/vls/v1/stations", {
       "contract": "Nantes",
       "apiKey": "45e674c06ed7a697fa6a3137149229a77f73e8fc"
     }));
+    // Convert the response to an UTF-8 format
     var utf8Response = Utf8Decoder().convert(response.bodyBytes);
     var jsonData = jsonDecode(utf8Response);
     List<StationInformation> stationInformations = [];
@@ -90,6 +92,7 @@ class _SearchState extends State<Search> {
             ),
             Row(
               children: [
+                // Switch to show only the stations with availables bikes
                 Switch(
                   value: availableBikeOnly,
                   activeColor: AppColors.mainBlue,
@@ -106,9 +109,10 @@ class _SearchState extends State<Search> {
               child: FutureBuilder(
                 future: getStationData(),
                 builder: (context, AsyncSnapshot snapshot) {
+                  // If there is no data, we display a loading circle
                   if (snapshot.data == null) {
                     return const Center(
-                      child: Text('Loading...'),
+                      child: CircularProgressIndicator(),
                     );
                   } else {
                     return Expanded(

@@ -28,6 +28,7 @@ class MarkersInformations {
 class HomeState extends State<Home> {
   List<Marker> markersList = [];
 
+  // Get information for the markers
   Future getMarkersData() async {
     var response = await http.get(Uri.https(
         "api.jcdecaux.com", "/vls/v1/stations", {
@@ -55,7 +56,6 @@ class HomeState extends State<Home> {
         ),
       );
     }
-
     return markersInformations;
   }
 
@@ -68,9 +68,10 @@ class HomeState extends State<Home> {
             child: FutureBuilder(
           future: getMarkersData(),
           builder: (context, AsyncSnapshot snapshot) {
+            // If there is no data, we display a loading circle
             if (snapshot.data == null) {
               return const Center(
-                child: Text("Loading..."),
+                child: CircularProgressIndicator(),
               );
             } else {
               return FlutterMap(
@@ -107,10 +108,12 @@ class HomeState extends State<Home> {
           },
             ),
           ),
+          // Create a SearchBar for the starting point
           Container(
             padding: const EdgeInsets.all(12),
             child: Searchbar(hintText: "Point de départ"),
           ),
+          // Create a SearchBar for the end point
           Container(
             padding: const EdgeInsets.fromLTRB(12, 65, 12, 12),
             child: Searchbar(hintText: "Point d'arrivée"),
